@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WSBSD NetBSD Terminal</title>
-    <link rel="icon" type="image/x-icon" href="./download (1) - Copy.ico">
+    <title>WSBSD DragonFly Terminal</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         body { background: #222; color: #eee; font-family: monospace; }
@@ -19,7 +18,7 @@
 </head>
 <body>
     <header>
-        <h1>WSBSD NetBSD Terminal</h1>
+        <h1>WSBSD DragonFly Terminal</h1>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
@@ -48,13 +47,13 @@
         <p>&copy; 2025 TTS Consulting. All rights reserved.</p>
     </footer>
     <script>
-        // --- Live NetBSD Terminal Simulation ---
+        // --- Live DragonFly Terminal Simulation ---
         const output = document.getElementById('output');
         const input = document.getElementById('input');
         const promptSpan = document.getElementById('prompt');
         let isRoot = false;
         let username = 'user';
-        let machineName = 'netbsd';
+        let machineName = 'dragonfly';
         let cwd = '/home/user';
         let booted = false;
         let bootIndex = 0;
@@ -63,9 +62,9 @@
             'Starting WSBSD 1.0.0.1...',
             'Starting WSBSD UNIX 7.0...',
             'Starting WSBSD 4.4BSDLite...',
-            'Starting WSBSD  NetBSD 10.1-STABLE',
-            'All Kernels started Now Starting WSBSD NetBSD 10.1',
-            'NetBSD Started Booting sh...',
+            'Starting WSBSD  DragonFlyBSD 6.4.2-STABLE',
+            'All Kernels started Now Starting WSBSD DragonFlyBSD 6.4.2',
+            'DragonFlyBSD Started Booting sh...',
             '',
             `System Uptime: 1 days, 2 hours, 3 mins`,
             '',
@@ -144,7 +143,7 @@
                 }
             } else if (cmd === 'neofetch') {
                 println('Starting Neofetch...');
-                println(`\u001b[31m\nuser@netbsd\n------------------------------------------------\nUser: user\nMachine: netbsd\nOS: NetBSD 10.1-RELEASE On NetBSD 10.1 amd64 (x64 or 64 Bits)\nKernel: NETBSDKERNEL: NetBSD 10.1-STABLE | BSDKENREL: 4.4BSDLite | UNIXKERNEL: Unix Kernel v7.0 | WSBSDKERNEL: WSBSD1.0.0.4\nUptime: 1 days, 2 hours, 3 mins\nShell: sh (Unix V7, 1979)\nCPU: Intel(R) CPU\nRAM: 8 GB\u001b[0m`);
+                println(`\u001b[31m\nuser@dragonfly\n------------------------------------------------\nUser: user\nMachine: dragonfly\nOS: DragonFlyBSD 6.4.2-RELEASE On DragonFlyBSD 6.4.2 amd64 (x64 or 64 Bits)\nKernel: DRAGONFLYKERNEL: DragonFlyBSD 6.4.2-STABLE | BSDKENREL: 4.4BSDLite | UNIXKERNEL: Unix Kernel v7.0 | WSBSDKERNEL: WSBSD1.0.0.4\nUptime: 1 days, 2 hours, 3 mins\nShell: sh (Unix V7, 1979)\nCPU: Intel(R) CPU\nRAM: 8 GB\u001b[0m`);
             } else {
                 println('Command not found.');
             }
