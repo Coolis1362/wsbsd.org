@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSBSD Terminal</title>
+    <link rel="icon" type="image/x-icon" href="./download (1) - Copy.ico">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #222; color: #eee; font-family: monospace; }
+        .terminal { background: #111; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; margin: 40px auto; min-height: 400px; }
+        .output { white-space: pre-wrap; }
+        .input-line { display: flex; }
+        .prompt { color: #44f; }
+        .input { background: none; border: none; color: #fff; flex: 1; font-family: inherit; font-size: 1em; outline: none; }
+        .logo { color: #00f; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WSBSD Terminal</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+                <li><a href="terminal.html">Live Terminal</a></li>
+                <li><a href="subdomains.html">Subdomains</a></li>
+                <li><a href="freebsdterminal.html">FreeBSD Live Terminal</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <div class="terminal" id="terminal">
+            <div class="output" id="output"></div>
+            <div class="input-line">
+                <span class="prompt" id="prompt"></span>
+                <input class="input" id="input" autocomplete="off" autofocus />
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 TTS Consulting. All rights reserved.</p>
+    </footer>
+    <script>
+        
+const os = require('os');
+const fs = require('fs');
+const path = require('path');
+const { spawn, exec } = require('child_process');
+const { promisify } = require('util');
+const execAsync = promisify(exec);
+const readline = require('readline');
+
+class Program {
+    // Equivalent to GetTickCount64() using Node.js process.uptime()
+    static GetTickCount64() {
+        return Math.floor(process.uptime() * 1000); // Convert to milliseconds
+    }
+
+    static GetUptime() {
+        const uptime = Program.GetTickCount64(); // Call equivalent method
+        const totalSeconds = Math.floor(uptime / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        return `${days} days, ${hours} hours, ${minutes} mins`;
+    }
+
+    static RunCommand(command) {
+        return new Promise((resolve, reject) => {
+            const isWindows = process.platform === 'win32';
+            const shell = isWindows ? 'cmd.exe' : '/bin/sh';
+            const args = isWindows ? ['/C', command] : ['-c', command];
+            
+            const childProcess = spawn(shell, args, {
+                stdio: ['pipe', 'pipe', 'pipe'],
+                windowsHide: true
+            });
+
+            let output = '';
+            childProcess.stdout.on('data', (data) => {
+                output += data.toString();
+            });
+
+            childProcess.stderr.on('data', (data) => {
+                output += data.toString();
+            });
+
+            childProcess.on('close', (code) => {
+                console.log(output);
+                resolve(output);
+            });
+
+            childProcess.on('error', (err) => {
+                console.error(`Error: ${err.message}`);
+                reject(err);
+            });
+        });
+    }
+
+    static async Main() {
+        // Set UTF-8 encoding equivalent
+        process.stdout.setEncoding('utf8');
+        
+        console.log("WSBSD BSD LOADER V1.0.0.4");
+        await this.Sleep(1000);
+        console.log("Starting WSBSD 1.0.0.1...");
+        await this.Sleep(1000);
+        console.log("Starting WSBSD UNIX 7.0...");
+        await this.Sleep(1000);
+        console.log("Starting WSBSD 4.4BSDLite...");
+        await this.Sleep(1000);
+        console.log("Starting WSBSD  FreeBSD 14-STABLE");
+        await this.Sleep(1000);
+        console.log("All Kernels started Now Starting WSBSD FreeBSD 14.2");
+        await this.Sleep(1000);
+        console.log("FreeBSD Started Booting sh...");
+        await this.Sleep(1000);
+        console.clear();
+        let isRoot = false; // Track root status
+        console.log(`System Uptime: ${this.GetUptime()}`);
+        console.log("\nPrompt Character Key: $ = Normal User (Standard Users) # = Root User (Administrator Users)");
+        
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+
+        const getUserInput = (prompt) => {
+            return new Promise((resolve) => {
+                rl.question(prompt, resolve);
+            });
+        };
+
+        while (true) {
+            const currentDirectory = process.cwd();
+            const fixedPath = currentDirectory.replace(/\\/g, '/');
+            const prompt = isRoot ? " ROOT#" : " NORMALUSER$"; // Switch prompt dynamically
+            const promptText = isRoot ? `\n${os.userInfo().username}@${os.hostname()}:${fixedPath} ${prompt} ` : `${prompt} `;
+            
+            const command = (await getUserInput(promptText))?.trim();
+
+            if (!command || command === '') {
+                continue;
+            }
+
+            if (command === "neofetch") {
+                await this.Neofetch();
+            }
+            else if (command === "clear") {
+                console.clear();
+            }
+            else if (command === "exit") {
+                console.log("Exiting WSBSD terminal.");
+                rl.close();
+                break;
+            }
+            else if (command === "help") {
+                console.log("Available commands: neofetch, clear, exit, help, ls, cd, echo, cat, about, pkg install, wine, root (More Commands Are In The Works)");
+            }
+            else if (command === "ls") {
+                try {
+                    const files = fs.readdirSync(currentDirectory);
+                    files.forEach(file => {
+                        const filePath = path.join(currentDirectory, file);
+                        const stats = fs.statSync(filePath);
+                        if (stats.isFile()) {
+                            console.log(file);
+                        }
+                    });
+                } catch (err) {
+                    console.error(`Error reading directory: ${err.message}`);
+                }
+            }
+            else if (command.startsWith("cd ")) {
+                const targetPath = command.substring(3).trim();
+                try {
+                    if (fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory()) {
+                        process.chdir(targetPath);
+                    } else {
+                        console.log(`Directory '${targetPath}' not found.`);
+                    }
+                } catch (err) {
+                    console.log(`Directory '${targetPath}' not found.`);
+                }
+            }
+            else if (command.startsWith("echo ")) {
+                const print_request = command.substring(5);
+                console.log(print_request);
+            }
+            else if (command.startsWith("cat ")) {
+                const filePath = command.substring(4).trim();
+                this.CatCommand(filePath);
+            }
+            else if (command === "about") {
+                console.log("WSBSD Terminal v1.0.0.4 - A simple terminal emulator (And Windows Subsystem) for BSD distros.");
+                console.log("Developed by Coolis1362");
+            }
+            else if (command.startsWith("pkg install ")) {
+                const msi_name = command.substring(12).trim();
+                await this.RunCommand(`${currentDirectory}\\${msi_name}.msi`);
+            }
+            else if (command.startsWith("wine ")) {
+                const exe_name = command.substring(5).trim();
+                await this.RunCommand(`${currentDirectory}\\${exe_name}.exe`);
+            }
+            else if (command === "root") {
+                isRoot = true;
+                console.log("You are now in root mode.");
+                await this.Sleep(1000);
+            }
+            else if (command === "root exit") {
+                if (isRoot = true) {
+                    console.log("You Are Now Exiting Root");
+                    isRoot = false;
+                }
+                else if (isRoot = false) {
+                    console.log("ERROR: NOT IN ROOT MODE!");
+                }
+            }
+            else {
+                console.log("Command not found.");
+            }
+        }
+    }
+
+    static async GetCPUInfo() {
+        try {
+            const cpus = os.cpus();
+            if (cpus && cpus.length > 0) {
+                return cpus[0].model;
+            }
+            return "Unknown CPU";
+        } catch (err) {
+            return "Unknown CPU";
+        }
+    }
+
+    static GetRAMInfo() {
+        try {
+            const totalMemory = os.totalmem();
+            const totalGB = Math.round((totalMemory / 1073741824) * 100) / 100;
+            return `${totalGB} GB`;
+        } catch (err) {
+            return "Unknown RAM";
+        }
+    }
+
+    static async Neofetch() {
+        console.log("Starting Neofetch..."); // Debug message
+        const asciiLogo = ` 
+:#%%%%%%%%%%#*=-..                     ....:---=========--::...                   ..:=+*#%%%%%%%#:
+ =%%%%%%%%%%%%%%%#*+-..            ..:-=*##%%%%%%%%%%%%%%%%%%%##*=-:..         ..:=*#%%%%%%%%%%%%%*
+=%%%%%%%%%%%%%%%%%%%%#=:..   ..:-*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+-:..  ..:=*#%%%%%%%%%%%%%%%%%*
+-%%%%%%%%%%%%%%%%%%%%##+:...-*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%##+:.:+#%%%%%%%%%%%%%%%%%%%%%=
+.*%%%%%%%%%%%%%%%%%#*:...=##%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*+*=:.:+##%%%%%%%%%%%%%%%%%%%%%%#.
+ :%%%%%%%%%%%%%%%#+:..-*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#-.. .:+##%%%%%%%%%%%%%%%%%%%%%%%%%-.
+ .=%%%%%%%%%%%%#=...=*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+. .-*#%%%%%%%%%%%%%%%%%%%%%%%%%%%+..
+  .*%%%%%%%%%#+:..=#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+. :*%%%%%%%%%%%%%%%%%%%%%%%%%%%%*.. 
+   :#%%%%%%#*:..=#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*: :*%%%%%%%%%%%%%%%%%%%%%%%%%%%#:.  
+   .:#%%%%#=..:*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*..=%%%%%%%%%%%%%%%%%%%%%%%%%%#-.   
+    .:#%#*-..=#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+.:+%%%%%%%%%%%%%%%%%%%%%%%%#:.    
+     .:#*..:*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+.:+#%%%%%%%%%%%%%%%%%%%%%#-.     
+      ....:#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*:.=#%%%%%%%%%%%%%%%%%%%#:.      
+        .-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#=.:*%%%%%%%%%%%%%%%%%#:...     
+       .:#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*-.-*#%%%%%%%%%%%%%*:.**:.    
+      .:#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*-.:+#%%%%%%%%%#=.:*#%*..   
+     .:*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*-..-+*#%%%%*-. .*%%%+.   
+    ..+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+-...::::..  .*%%%#=.  
+    .:%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+-:..    .=#%%%%#.. 
+   ..*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*+==+##%%%%%%=..
+   .-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#:.
+   .+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%-.
+   .#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%+.
+   :#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#.
+   -%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.
+   -%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%:
+   -%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%:
+   -%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%:
+   -%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#.
+   .#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*.
+   .*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%=.
+   .=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#:.
+   ..#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%+..
+    .=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#:. 
+    ..*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%+.  
+     .:#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#:.  
+      .-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#:.   
+       .=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#-.    
+       ..=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#-..    
+        ..=%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#-..     
+         ..-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#:.       
+           .:*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%+:.        
+             .=#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#-.          
+              .:+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+:.           
+                .-*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*:.             
+                  .-*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+:.               
+                    .:*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#+.                  
+                      ..-*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*-..                   
+                        ..:-*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*-..                      
+                            ..-=*#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#*=:..                         
+                                ..:=+*#%%%%%%%%%%%%%%%%%%%%%%%%##*+-:..                             
+        `;
+        
+        const cpuInfo = await this.GetCPUInfo();
+        const ramInfo = this.GetRAMInfo();
+        const systemInfo = "\u001b[31m" + `
+        ${os.userInfo().username}@${os.hostname()}
+        ------------------------------------------------
+        User: ${os.userInfo().username}
+        Machine: ${os.hostname()}
+        OS: FreeBSD 14.2-RELEASE On ${os.type()} ${os.release()} amd64 (x64 or 64 Bits)
+        Kernel: FREEBSDKERNEL: FreeBSD 14-STABLE | BSDKENREL: 4.4BSDLite | UNIXKERNEL: Unix Kernel v7.0 | WSBSDKERNEL: WSBSD1.0.0.4
+        Uptime: ${this.GetUptime()}
+        Shell: sh (Unix V7, 1979)
+        CPU: ${cpuInfo}
+        RAM: ${ramInfo} GB` + "\u001b[0m";
+
+        // 🛠️ **Updated printing method to prevent buffer overload**
+        if (process.stdout.isTTY) {
+            const logoLines = asciiLogo.split('\n');
+            for (const line of logoLines) {
+                console.log("\u001b[31m" + line + "\u001b[0m");
+                await this.Sleep(10); // Slight delay to prevent buffer issues
+            }
+            console.log("ASCII Logo Loaded."); // Debug message
+        }
+        console.log(systemInfo);
+        console.log("System Info Loaded."); // Debug message
+        
+        // Wait for user input equivalent to Console.ReadKey()
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        
+        return new Promise((resolve) => {
+            rl.question('Press Enter to continue...', () => {
+                rl.close();
+                resolve();
+            });
+        });
+    }
+
+    static CatCommand(filePath) {
+        if (fs.existsSync(filePath)) {
+            try {
+                const content = fs.readFileSync(filePath, 'utf8');
+                console.log(content);
+            } catch (err) {
+                console.log(`Error: Unable to read file '${filePath}'. ${err.message}`);
+            }
+        } else {
+            console.log(`Error: File '${filePath}' not found.`);
+        }
+    }
+
+    static Sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+}
+
+// Entry point - equivalent to Main method
+Program.Main().catch(console.error);
+
+
+</script>
+</body>
+</html>
