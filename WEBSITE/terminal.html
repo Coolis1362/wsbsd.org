@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSBSD Terminal</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #222; color: #eee; font-family: monospace; }
+        .terminal { background: #111; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; margin: 40px auto; min-height: 400px; }
+        .output { white-space: pre-wrap; }
+        .input-line { display: flex; }
+        .prompt { color: #44f; }
+        .input { background: none; border: none; color: #fff; flex: 1; font-family: inherit; font-size: 1em; outline: none; }
+        .logo { color: #00f; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WSBSD Terminal</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <div class="terminal" id="terminal">
+            <div class="output" id="output"></div>
+            <div class="input-line">
+                <span class="prompt" id="prompt"></span>
+                <input class="input" id="input" autocomplete="off" autofocus />
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 TTS Consulting. All rights reserved.</p>
+    </footer>
+    <script>
+        // --- Simulated C# terminal logic ---
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const promptSpan = document.getElementById('prompt');
+        let isLoggedIn = false;
+        let isRoot = false;
+        let username = '';
+        let awaitingPassword = false;
+        let awaitingUsername = false;
+        let passwordTry = '';
+        let machineName = 'WSBSD-PC';
+        let domain = machineName + '.wsbsd.openbsd';
+
+        // Simulated ASCII logo
+        const wsbsdLogo = `
+........................................................................
+.:********************************+..+********************************-.
+.:********************************+..+********************************-.
+.:********************************+..+****+++++++++++++++++++++*******-.
+.:********#**+++*****+++*#********+..+***-     ..::-=-::..    :+******-.
+.:*******#%#*+#%%%%%++*#%%********+..+***-  ..:+*********+:.  :+******-.
+.:******+==+#%%%%%%%+*%%%+=*******+..+***-  .+*************=. :+******-.
+.:******+-=#%%%%%%%%#*+#===*******+..+***- .-*****+=-..:-+**=.:+******-.
+.:******+=*%%%%%%%%%%%####+*******+..+***-.-:....    ..:-=+++-:+******-.
+.:******++#%%%%%%%%%%%%%%%#*******+..+***-.==-     .:=+******=-+******-.
+.:******+=*%%%%%%%%%%%%%%%+*******+..+***-.=*====++**********=-+******-.
+.:******+:-#%%%%%%%%%%%%%=-*******+..+***-.-*+-+*************-:+******-.
+.:******+:.-*#%%%%%%%%%#=.-*******+..+***- .=*+-************=.:+******-.
+.:******+-...-*#######=...-*******+..+***-  .=*+:**********=. :+******-.
+.:********************************+..+***-    .-=-******+-.   :+******-.
+.:********************************+..+***+---------====-------=+******-.
+.:********************************+..+********************************-.
+.:********************************+..+********************************-.
+.:********************************+..+********************************-.
+........................................................................
+.:++++++++++++++++++++++++++++++++=..=++++++++++++++++++++++++++++++++:.
+.:********************************+..+********************************-.
+.:********************************+..+********************************-.
+.:********************************+..+*****+......:*#**#*-.....:+*****-.
+.:*****+:........----........+****+..+*****+.=:==*=--+#-:=++-:-=+*****-.
+.:*****+:      :----==:.     +****+..+*****+.:=..:-=+%%+=-...-::+*****-.
+.:*****+:     :-=:::-=-.     +****+..+*****+ ..-*---+##+--=++..:+*****-.
+.:*****+:   .:---:.::-=.     +****+..+******--::-::-=##=:::--:-=+*****-.
+.:*****+:    .:==--:--+-.    +****+..+******:--::-===##===--:---+*****-.
+.:*****+:      :---===:.     +****+..+*****+   .-*-:-**::-+=.. :+*****-.
+.:*****+:       .--=-:.      +****+..+*****+   ..:*++#*=++-..  :+*****-.
+.:*****+::=-.......=+=-=+++=.+****+..+*****+      ..:**..      :+*****-.
+.:*****+====*+++*******#%#+*+*****+..+*****+       .:**.       :+*****-.
+.:*****+==+==+==++****#****#+*****+..+*****+       .:**        :+*****-.
+.:******###**################*****+..+*****+       .:*+        :+*****-.
+.:********************************+..+********************************-.
+.:********************************+..+********************************-.
+.:********************************+..+********************************-.
+........................................................................`;
+const wsbsdopenbsdlogo= `
+      :=*####*+:.. =*#######***+-.  .:+#####*###########***=:..    
+    .:*%*--+%%+--#%-.                              :#%%*****%%****%%+%#**%@@#***%%#****#%#***#%@=.  
+   :##=--*%+.:#=--+%=:-==-===:.   .-===-...::-=-:===:.@%****@+@****#@#**%#=:-#%*%@@****%#-*@#***%#:.
+ .-%=---%#:. :%=---+====#====*#-+%#====+%%====+%+===#*@%****@%%****%@#*****#%%@%%%%****%#. +%****##.
+.:#=---#@:  .**---+%#---#@#---%%=--*@*--#@#---+*%---*#@%*********#%%*%%********%%#%****%#. :%#***#%.
+.=#---=%=  .*%---=%%---#@@*--=%=--=*-=*%%@=--=@%+--+%:@%****@*%%****%%%%%%##****#@@****%#. -%****%#.
+.=%---*%. :##---#@@*--+@@#--=%*---%@@@*%%+--+%@*---%%%@%****@-*%****#*#%=.:-%#**#@%****%#.-%#***%%-.
+ .+%=--#%%#=-=#%*=#=--##=-=#%#%=--=+==%@%--=#%%=---+%%%#****%%%***#@%***#%%%%**#@%%****%%%#**#%%*.  
+=#%%@@%%#%%%@@@#+%+--*%%%@@@%%@@@%%%@@@@@%%@@%@@%%@@@@@@@@@@@@@@@@@@@%@@%%%%%@@@@@@@@@@@@@@@@@@%%#*-
+%%%%%%%%%%%%%%%@@#---@%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@%
+..------------=#%%%%%%%#------------------------------------------------------------------:::::::::.`
+
+        // Simulated boot sequence
+        const bootSequence = [
+            { text: wsbsdLogo, delay: 10 },
+            { text: "ASCII Logo Loaded.", delay: 200 },
+            { text: "Using drive 0, partition 3", delay: 200 },
+            { text: "Loading......", delay: 200 },
+            { text: "probing: pc0 mem[638K 253M 1024K a20=on]", delay: 200 },
+            { text: "disk: nd0+", delay: 200 },
+            { text: ">> OpenBSD/amd64 BOOT 3.67", delay: 200 },
+            { text: "boot> ", delay: 800 },
+            { text: "/WSBSD/OpenBSD/7.7/root/WSBSD OpenBSD 7.7.exe", delay: 800 },
+            { text: "WSBSD BSD LOADER 1.0.0.4-1", delay: 500 },
+            { text: "Starting WSBSD 1.0.0.4-1...", delay: 500 },
+            { text: "Starting WSBSD UNIX 7.0...", delay: 500 },
+            { text: "Starting WSBSD 4.4BSDLite...", delay: 500 },
+            { text: "Starting WSBSD OpenBSD 7.7 Kernel...", delay: 500 },
+            { text: "Starting WSBSD OpenBSD 7.7...", delay: 500 },
+            { text: "All Kernels started Now Starting WSBSD OpenBSD 7.7", delay: 500 },
+            { text: "OpenBSD Started Booting sh...", delay: 500 },
+            { text: "", delay: 200 },
+            { text: `System Uptime: 1 days, 2 hours, 3 mins\n`, delay: 200 },
+            { text: `OpenBSD/amd64 (${domain})\n`, delay: 200 },
+        ];
+
+        function print(text) {
+            output.innerHTML += text.replace(/\n/g, '<br>');
+            output.scrollTop = output.scrollHeight;
+        }
+        function println(text) {
+            print(text + '<br>');
+        }
+
+        function setPrompt() {
+            if (!isLoggedIn) {
+                promptSpan.textContent = '';
+            } else {
+                promptSpan.textContent = isRoot ? `${machineName}# ` : ` ${machineName}$ `;
+            }
+        }
+
+        function boot(i = 0) {
+            if (i < bootSequence.length) {
+                print(bootSequence[i].text + '\n');
+                setTimeout(() => boot(i + 1), bootSequence[i].delay);
+            } else {
+                print(`(PASSWORD IS '${machineName}') LOGIN: `);
+                awaitingUsername = true;
+                input.focus();
+            }
+        }
+
+        function handleCommand(cmd) {
+            cmd = cmd.trim();
+            if (cmd === '') return;
+            println((isRoot ? `${machineName}# ` : ` ${machineName}$ `) + cmd);
+            switch (cmd) {
+                case 'help':
+                    println("Available commands: neofetch, clear, exit, help, ls, echo, about, whoami, uname, pwd");
+                    break;
+                case 'clear':
+                    output.innerHTML = '';
+                    break;
+                case 'about':
+                    println("WSBSD Terminal v1.0.0.4-1 - A simple terminal emulator (And Windows Subsystem) for BSD distros.");
+                    println("Developed by Coolis1362");
+                    println("Made On: Visual Studio 2022 17.14.2 Preview 1.0");
+                    println("Written in: C# 8.0");
+                    println("Compiled With: .NET Framework v4.7.2");
+                    println("License (Source Code): MIT License (No rights Reserved)");
+                    println("License (Binary): Copyright (All Rights Reserved), and you can not use this for illegal purposes.");
+                    break;
+                case 'exit':
+                    println("Exiting WSBSD terminal.");
+                    isLoggedIn = false;
+                    setPrompt();
+                    setTimeout(() => location.reload(), 1000);
+                    break;
+                case 'ls':
+                    println("Program.cs\nREADME.md\nLICENSE");
+                    break;
+                case 'whoami':
+                    println(`WSBSD USER: ${username}`);
+                    println(`WINDOWS USER: ${machineName}`);
+                    break;
+                case 'uname':
+                    println(`OpenBSD ${domain} 7.7 GENERIC#619 amd64 (x64 or 64-Bits)`);
+                    break;
+                case 'pwd':
+                    println(`/WSBSD/OpenBSD/7.7/root/WSBSD OpenBSD 7.7`);
+                    break;
+                case 'neofetch':
+                    println("Starting Neofetch...");
+                    println(wsbsdopenbsdlogo);
+                    println(`User: ${username}\nMachine: ${machineName}\nOS: OpenBSD 7.7 On Windows amd64 (x64 or 64 Bits)\nKernel: OpenBSD 7.7 Kernel | 4.4BSD-Lite | Unix Kernel v7.0 | WSBSD1.0.0.4-1\nUptime: 1 days, 2 hours, 3 mins\nShell: sh (Unix V7, 1979)\nCPU: Intel(R) CPU\nRAM: 8 GB`);
+                    break;
+                default:
+                    if (cmd.startsWith('echo ')) {
+                        println(cmd.slice(5));
+                    } else {
+                        println(`Command '${cmd}' not recognized. Type 'help' for a list of commands.`);
+                    }
+            }
+        }
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                let value = input.value;
+                input.value = '';
+                if (awaitingUsername) {
+                    username = value;
+                    print('PASSWORD: ');
+                    awaitingUsername = false;
+                    awaitingPassword = true;
+                } else if (awaitingPassword) {
+                    if (value === machineName) {
+                        println('Login successful.');
+                        isLoggedIn = true;
+                        isRoot = (username === 'root');
+                        println(`Welcome,  ${username}`);
+                        println(`Login Time: ${new Date().toLocaleString()}`);
+                        println(`OpenBSD 7.7 (GENERIC) #619: Sun Apr 13 08:19:34 MDT 2025\n`);
+                        println(`Welcome to OpenBSD: The proactively secure Unix-like operating system\n`);
+                        println(`Please Report Bugs In This Link In Your Windows Browser: https://github.com/TTSConsulting/WSBSD/issues\n`);
+                        setPrompt();
+                    } else {
+                        println('Incorrect password. Exiting WSBSD terminal.');
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                    awaitingPassword = false;
+                } else if (isLoggedIn) {
+                    handleCommand(value);
+                }
+            }
+        });
+
+        setPrompt();
+        boot();
+        input.focus();
+    </script>
+</body>
+</html>
