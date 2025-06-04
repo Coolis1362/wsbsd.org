@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSBSD NetBSD Terminal</title>
+    <link rel="icon" type="image/x-icon" href="./download (1) - Copy.ico">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #222; color: #eee; font-family: monospace; }
+        .terminal { background: #111; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; margin: 40px auto; min-height: 400px; }
+        .output { white-space: pre-wrap; }
+        .input-line { display: flex; }
+        .prompt { color: #44f; }
+        .input { background: none; border: none; color: #fff; flex: 1; font-family: inherit; font-size: 1em; outline: none; }
+        .logo { color: #00f; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WSBSD NetBSD Terminal</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+                <li><a href="terminal.html">Live Terminal</a></li>
+                <li><a href="subdomains.html">Subdomains</a></li>
+                <li><a href="freebsdterminal.html">FreeBSD Live Terminal</a></li>
+                <li><a href="netbsdterminal.html">NetBSD Live Terminal</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <div class="terminal" id="terminal">
+            <div class="output" id="output"></div>
+            <div class="input-line">
+                <span class="prompt" id="prompt"></span>
+                <input class="input" id="input" autocomplete="off" autofocus />
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 TTS Consulting. All rights reserved.</p>
+    </footer>
+    <script>
+        // --- Live NetBSD Terminal Simulation ---
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const promptSpan = document.getElementById('prompt');
+        let isRoot = false;
+        let username = 'user';
+        let machineName = 'netbsd';
+        let cwd = '/home/user';
+        let booted = false;
+        let bootIndex = 0;
+        let bootSequence = [
+            'WSBSD BSD LOADER V1.0.0.4',
+            'Starting WSBSD 1.0.0.1...',
+            'Starting WSBSD UNIX 7.0...',
+            'Starting WSBSD 4.4BSDLite...',
+            'Starting WSBSD  NetBSD 10.1-STABLE',
+            'All Kernels started Now Starting WSBSD NetBSD 10.1',
+            'NetBSD Started Booting sh...',
+            '',
+            `System Uptime: 1 days, 2 hours, 3 mins`,
+            '',
+            'Prompt Character Key: $ = Normal User (Standard Users) # = Root User (Administrator Users)',
+            '',
+        ];
+
+        function print(text) {
+            output.innerHTML += text.replace(/\n/g, '<br>');
+            output.scrollTop = output.scrollHeight;
+        }
+        function println(text) {
+            print(text + '<br>');
+        }
+        function setPrompt() {
+            promptSpan.textContent = (isRoot ? `${username}@${machineName}:${cwd} ROOT# ` : `NORMALUSER$ `);
+        }
+
+        function boot() {
+            if (bootIndex < bootSequence.length) {
+                println(bootSequence[bootIndex]);
+                bootIndex++;
+                setTimeout(boot, 400);
+            } else {
+                booted = true;
+                setPrompt();
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        function handleCommand(cmd) {
+            cmd = cmd.trim();
+            if (!cmd) return;
+            println((isRoot ? `${username}@${machineName}:${cwd} ROOT# ` : `NORMALUSER$ `) + cmd);
+            if (cmd === 'help') {
+                println('Available commands: neofetch, clear, exit, help, ls, cd, echo, cat, about, root, root exit');
+            } else if (cmd === 'clear') {
+                output.innerHTML = '';
+            } else if (cmd === 'about') {
+                println('WSBSD Terminal v1.0.0.4 - A simple terminal emulator (And Windows Subsystem) for BSD distros.');
+                println('Developed by Coolis1362');
+            } else if (cmd === 'exit') {
+                println('Exiting WSBSD terminal.');
+                setTimeout(() => location.reload(), 1000);
+            } else if (cmd === 'ls') {
+                println('Program.cs\nREADME.md\nLICENSE');
+            } else if (cmd.startsWith('cd ')) {
+                let path = cmd.slice(3).trim();
+                if (path.startsWith('/')) {
+                    cwd = path;
+                } else {
+                    cwd = cwd.replace(/\/$/, '') + '/' + path;
+                }
+                println('');
+            } else if (cmd.startsWith('echo ')) {
+                println(cmd.slice(5));
+            } else if (cmd.startsWith('cat ')) {
+                let file = cmd.slice(4).trim();
+                if (file === 'README.md') {
+                    println('# WSBSD Terminal\nA simple terminal emulator for BSD distros.');
+                } else if (file === 'Program.cs') {
+                    println('// Simulated Program.cs output');
+                } else {
+                    println(`Error: File '${file}' not found.`);
+                }
+            } else if (cmd === 'root') {
+                isRoot = true;
+                println('You are now in root mode.');
+            } else if (cmd === 'root exit') {
+                if (isRoot) {
+                    println('You Are Now Exiting Root');
+                    isRoot = false;
+                } else {
+                    println('ERROR: NOT IN ROOT MODE!');
+                }
+            } else if (cmd === 'neofetch') {
+                println('Starting Neofetch...');
+                println(`\u001b[31m\nuser@netbsd\n------------------------------------------------\nUser: user\nMachine: netbsd\nOS: NetBSD 10.1-RELEASE On NetBSD 10.1 amd64 (x64 or 64 Bits)\nKernel: NETBSDKERNEL: NetBSD 10.1-STABLE | BSDKENREL: 4.4BSDLite | UNIXKERNEL: Unix Kernel v7.0 | WSBSDKERNEL: WSBSD1.0.0.4\nUptime: 1 days, 2 hours, 3 mins\nShell: sh (Unix V7, 1979)\nCPU: Intel(R) CPU\nRAM: 8 GB\u001b[0m`);
+            } else {
+                println('Command not found.');
+            }
+        }
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && booted) {
+                let value = input.value;
+                input.value = '';
+                handleCommand(value);
+                setPrompt();
+            }
+        });
+
+        input.disabled = true;
+        boot();
+    </script>
+</body>
+</html>
