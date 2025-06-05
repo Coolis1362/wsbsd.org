@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WSBSD FreeBSD Terminal</title>
+    <link rel="icon" type="image/x-icon" href="./download (1) - Copy.ico">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { background: #222; color: #eee; font-family: monospace; }
+        .terminal { background: #111; padding: 20px; border-radius: 8px; width: 90%; max-width: 800px; margin: 40px auto; min-height: 400px; }
+        .output { white-space: pre-wrap; }
+        .input-line { display: flex; }
+        .prompt { color: #44f; }
+        .input { background: none; border: none; color: #fff; flex: 1; font-family: inherit; font-size: 1em; outline: none; }
+        .logo { color: #00f; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>WSBSD FreeBSD Terminal</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="downloads.html">Downloads</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+                <li><a href="openbsdterminal.html">OpenBSD Live Terminal</a></li>
+                <li><a href="subdomains.html">Subdomains</a></li>
+                <li><a href="freebsdterminal.html">FreeBSD Live Terminal</a></li>
+                <li><a href="netbsdterminal.html">NetBSD Live Terminal</a></li>
+                <li><a href="dragonflyterminal.html">DragonFly Live Terminal</a></li>
+                <li><a href="news.html">News</a></li>
+                <li><a href="annoucements.html">Announcements</a></li>
+                <li><a href="mignightbsdterminal.html">MidnightBSD Live Terminal</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section>
+        <div class="terminal" id="terminal">
+            <div class="output" id="output"></div>
+            <div class="input-line">
+                <span class="prompt" id="prompt">$</span>
+                <input class="input" id="input" autocomplete="off" autofocus />
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 TTS Consulting. All rights reserved.</p>
+    </footer>
+    <script>
+    // Simple browser-based fake terminal
+    const output = document.getElementById('output');
+    const input = document.getElementById('input');
+    const promptSpan = document.getElementById('prompt');
+
+    let isRoot = false;
+
+    function print(text, color) {
+        const span = document.createElement('span');
+        if (color) span.style.color = color;
+        span.textContent = text + '\n';
+        output.appendChild(span);
+        output.scrollTop = output.scrollHeight;
+    }
+
+    function clearOutput() {
+        output.innerHTML = '';
+    }
+
+    function getUptime() {
+        const now = Date.now();
+        const seconds = Math.floor(performance.now() / 1000);
+        const days = Math.floor(seconds / 86400);
+        const hours = Math.floor((seconds % 86400) / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return `${days} days, ${hours} hours, ${minutes} mins`;
+    }
+
+    function printNeofetch() {
+        print(`                  ..:-=+*#%@@@@@@@@@@@@@@%%#++-:..                                  
+                              .:-+#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%*=:..                             
+                          ..-*%@@@@@@@@@%%#*+=-::::::-==+#%%@@@@@@@@@@#=:..                         
+                       ..-#@@@@@@@@#+:.                      ..-*%@@@@@@@@+:..                      
+                     .-#@@@@@@@*-....                           ...:=%@@@@@@%+.                     
+                   .+%@@@@@%=:..        ..:.                        ...-*@@@@@@#-.                  
+                .:+%@@@@%+:.       .:+#%*-..                            ..-#@@@@@#-.                
+              ..+%@@@@#=..     .:+#@@@%-..                                 .:+@@@@@#-.              
+             .-%@@@@#-.     .:+%@@@@@+.                                      .:+%@@@@*:.            
+           .:*@@@@%=.     .-#@@@@@@%-.                                          :*@@@@%=.           
+          .-%@@@@+.    ..=%@@@@@@@*:.                                            .-#@@@@+..         
+        ..=@@@@%-     .-#@@@@@@@@*:                                                .*@@@@#:.        
+        .+@@@@#.     .*@@@@@@@@@#:                                                   =%@@@%:.       
+       .+@@@@*.    .-%@@@@@@@@@%-.                                                   .-%@@@%:.      
+      .=@@@@+.    .=@@@@@@@@@@@=.                                                     .:%@@@%:.     
+     .-@@@@*.    .=@@@@@@@@@@@*:                                                       .-%@@@#..    
+    .:%@@@#.    .=@@@@@@@@@@@@=.                                                         =%@@@+.    
+    .*@@@%:    .=@@@@@@@@@@@@#-                                                          .+@@@@-.   
+   .-@@@@=    .:#@@@@@@@@@@@@*:                                                           .%@@@#..  
+   .#@@@%.    .+@@@@@@@@@@@@@+.                                                            =@@@@-.  
+   :@@@@+    .:%@@@@@@@@@@@@@+.                                                            .%@@@*.  
+   =@@@@:    .+@@@@@@@@@@@@@@+.                                         ...                .+@@@%.. 
+   #@@@#.    :#@@@@@@@@@@@@@@*.                                        .=%*:                -%@@@-. 
+  .%@@@*.    :%@@@@@@@@@@@@@@*:                                       .-#@@*:               :%@@@-. 
+  .%@@@+     -@@@@@@@@@@@@@@@%-.                                    .-%@@@@@@+.             :%@@@+. 
+  .%@@@=     -@@@@@@@@@@@@@@@@+.                                   .:#@@@@@@@@+.            .#@@@+. 
+  .%@@@+     -@@@@@@@@@@@@@@@@%-.                                 .:*@@@@@@@@@@=.           :%@@@+. 
+  .%@@@*.    :%@@@@@@@@@@@@@@@@*:.             ...              .:*@@@@@@@@@@@+:            :%@@@=. 
+   #@@@#.    :*@@@@@@@@@@@@@@@@@+.             *#-.         ...:=@@@@@@@@@@%=..             -%@@@-. 
+   +@@@@.    .=@@@@@@@@@@@@@@@@@@=.             .#%.      .:*@@@@@@@@@@@@@@*.               +@@@%.. 
+   -@@@@=    .:#@@@@@@@@@@@@@@@@@@=.             .%+   .:#@@@@@@@@@@@@@@@@@#:              .#@@@*.  
+   .#@@@%.    .=@@@@@@@@@@@@@@@@@@@+.           .+@- ..+@@@@@@@@@@@@@@@@@@@#:              =@@@@-.  
+   .-@@@@=    .:*@@@@@@@@@@@@@@@@@@@#:.        .*@-. .*@@@@@@@@@@@@@@@@@@@@+.             .#@@@#..  
+    .#@@@%:    .-%@@@@@@@@@@@@@@@@@@@@=..      +@=   :@@@@@@@@@@@@@@@@@@@@+.              +@@@@-.   
+    .:@@@@*.    .-%@@@@@@@@@@@@@@@@@@@@%=..    #%:   =@@@@@@@@@@@@@@@@@@@+.              -%@@@+.    
+     .=@@@@+.    .-%@@@@@@@@@@@@@@@@@@@@@%=..  =@=.  *@@@@@@@@@@@@@@@@@@%=              :#@@@%:.    
+      .+@@@@+.    .-%@@@@@@@@@@@@@@@@@@@@@@@+:..#@=. +@@@@@@@@@@@@@@@@@@%-            .:#@@@%-.     
+       .*@@@@+.     :*@@@@@@@@@@@@@@@@@@@@@@@@@+:%@%.:@@@@@@@@@@@@@@#+@@%-    ...    .:#@@@@-.      
+       ..*@@@@*.    ..=%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+:#@%=  .:-:.    -%@@@@-.       
+        ..+@@@@#:     .:+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#::*@@@%%%+..   .+@@@@%-.        
+         ..-%@@@%=.     .:*@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@+:.    :*@@@@*:.         
+           .:#@@@@#-.     .:+%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%=:.    .+%@@@@+..          
+             .=%@@@@*-.      .-*%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%*-.     .=%@@@@#:.            
+              .:*@@@@@*-.       .-+#%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#+:.     .:=%@@@@%-.              
+                .:*@@@@@%=..        .:=*%%@@@@@@@@@@@@@@@@@@%%*=:.      ..:*@@@@@%=.                
+                  .:*@@@@@@#-...          ..:-=+**##**++-:..         ..:+%@@@@@%=.                  
+                     .=%@@@@@@%=..                                 .-*@@@@@@@*:.                    
+                      ..:+%@@@@@@@%*-..                       .:=#%@@@@@@@#-..                      
+                         ..:=#@@@@@@@@@%%#*==::.......:-=+*#%@@@@@@@@@%*-..                         
+                             ..:=*%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#+-:.                             
+                                  ..:=+*#%@@@@@@@@@@@@@@@@@%#*+-:..                                                              
+
+WSBSD BSD LOADER V1.0.0.4
+System Uptime: ${getUptime()}
+User: browser
+Machine: web
+OS: FakeBSD 1.0 (Browser)
+Kernel: JS Kernel
+Shell: JS Shell
+CPU: Browser
+RAM: Unknown
+
+System Info Loaded.
+`);
+    }
+
+    function printHelp() {
+        print("Available commands: neofetch, clear, exit, help, about, echo, root, root exit");
+    }
+
+    function printAbout() {
+        print("WSBSD Terminal v1.0.0.4 - A simple terminal emulator (And Windows Subsystem) for BSD distros.\nDeveloped by Coolis1362");
+    }
+
+    function handleCommand(cmd) {
+        if (!cmd.trim()) return;
+        print((isRoot ? "#" : "$") + " " + cmd, "#44f");
+
+        if (cmd === "help") printHelp();
+        else if (cmd === "clear") clearOutput();
+        else if (cmd === "about") printAbout();
+        else if (cmd === "exit") {
+            print("Exiting WSBSD terminal.");
+            input.disabled = true;
+        }
+        else if (cmd === "neofetch") printNeofetch();
+        else if (cmd.startsWith("echo ")) print(cmd.slice(5));
+        else if (cmd === "root") {
+            if (!isRoot) {
+                isRoot = true;
+                promptSpan.textContent = "#";
+                print("You are now in root mode.");
+            } else print("Already in root mode.");
+        }
+        else if (cmd === "root exit") {
+            if (isRoot) {
+                isRoot = false;
+                promptSpan.textContent = "$";
+                print("You Are Now Exiting Root");
+            } else print("ERROR: NOT IN ROOT MODE!");
+        }
+        else {
+            print("Command not found.");
+        }
+    }
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === "Enter") {
+            const value = input.value;
+            handleCommand(value);
+            input.value = "";
+        }
+    });
+
+    window.onload = function() {
+        print("WSBSD FreeBSD Live Terminal (Browser Edition)\nType 'help' to see available commands.");
+        input.focus();
+    }
+    </script>
+</body>
+</html>
