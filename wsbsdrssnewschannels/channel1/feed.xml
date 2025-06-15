@@ -30,8 +30,6 @@
           IDLE → No new transmissions but the channel remains open and ready.
 
           DFTD (Done For The Day) → Broadcasting has ended for now. Channel entered low-power standby.
-
-          CRIT-FAIL (Optional for flavor) → System fault detected—couldn't push feed due to error or downtime.
       </description>
     </item>
   </channel>
