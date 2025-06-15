@@ -16,21 +16,23 @@
       <description>We are pleased to announce the launch of WSBSD RSS News Channel 1. This channel will provide updates on the latest releases and developments in the WSBSD project. The Other email that's Older then this email is a test of WSBSD RSS News Channel 1. 😊😀 The Link you see is the xml code of WSBSD RSS News Channel 1.</description>
     </item>
     <item>
-      <title>WSBSD RSS News Channel 1 Life Daily Cycle.</title>
-      <link>https://coolis1362.github.io/wsbsd.org/wsbsdrssnewschannels/channel1/feed.xml</link>
-      <pubDate>Wed, 14 May 2025 9:43 EDT</pubDate>
-      <description>First We Start The WSBSD RSS News Channel Number By Number. And then and then it will share the news! (the status will be the bottom of the rss email.)
-        Here's the Status States:
-         SFTD (Starting For The Day) → The uplink is initializing. System checks passed. Broadcasting begins.
+  <title>WSBSD RSS News Channel 1 Daily Broadcast Cycle</title>
+  <link>https://coolis1362.github.io/wsbsd.org/wsbsdrssnewschannels/channel1/feed.xml</link>
+  <pubDate>Wed, 14 May 2025 09:43:00 EDT</pubDate>
+  <description>
+    WSBSD RSS News Channel 1 is now active. This feed follows a structured broadcast cycle designed to simulate a digital comms system.
 
-          OPERATIONAL → Actively transmitting new updates or monitoring system state.
+    News updates will be shared throughout the day. A system status line will appear at the bottom of each RSS email, reflecting the channel's current state.
 
-          UPDATING → Feed is being modified—new <code><item></item></code> block queued or deployed.
+    ——
+    <strong>Channel Status Codes:</strong>
 
-          IDLE → No new transmissions but the channel remains open and ready.
-
-          DFTD (Done For The Day) → Broadcasting has ended for now. Channel entered low-power standby.
-      </description>
-    </item>
+    • <strong>SFTD</strong> (Starting For The Day) — Uplink initialized. Broadcasting begins.  
+    • <strong>OPERATIONAL</strong> — Actively transmitting news or monitoring system state.  
+    • <strong>UPDATING</strong> — Feed is being modified. New &lt;item&gt; queued or deployed.  
+    • <strong>IDLE</strong> — No current updates, channel on standby.  
+    • <strong>DFTD</strong> (Done For The Day) — Broadcasting paused. Channel offline until next cycle.
+  </description>
+</item>
   </channel>
 </rss>
