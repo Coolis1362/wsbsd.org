@@ -2,7 +2,12 @@
   <channel>
     <title>WSBSD RSS News Channel 1</title>
     <link>https://coolis1362.github.io/wsbsd.org/news.html</link>
-    <description>Latest releases and updates from WSBSD</description>
+    <description>
+     WSBSD RSS News Channel 1 delivers structured daily transmissions from the WSBSD project. This channel shares version updates, delays, announcements, and system status logs—formatted like mission briefings.
+
+     Each broadcast includes a status signature (e.g. SFTD, OPERATIONAL, DFTD) to simulate the WSBSD system's state throughout the cycle. Channel 1 is the flagship node in the WSBSD RSS network.
+    </description>
+
     <item>
       <title>WSBSD 1.0.0.4-5 Is Delayed</title>
       <link>https://coolis1362.github.io/wsbsd.org/annoucements/1.0.0.4-5.html</link>
