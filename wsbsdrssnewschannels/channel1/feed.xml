@@ -32,7 +32,7 @@
      • <strong>UPDATING</strong> — Feed is being modified. New &lt;item&gt; queued or deployed.  
      • <strong>IDLE</strong> — No current updates, channel on standby.  
      • <strong>DFTD</strong> (Done For The Day) — Broadcasting paused. Channel offline until next cycle.
-  </description>
-</item>
+     </description>
+    </item>
   </channel>
 </rss>
