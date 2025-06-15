@@ -1,20 +1,19 @@
-<!-- Sample RSS template when you're ready -->
 <rss version="2.0">
   <channel>
-    <title>WSBSD News</title>
+    <title>WSBSD RSS News Channel 1</title>
     <link>https://coolis1362.github.io/wsbsd.org/news.html</link>
     <description>Latest releases and updates from WSBSD</description>
-    <item>
-      <title>WSBSD 1.0.0.4-4 Released</title>
-      <link>https://github.com/TTSConsulting/WSBSD/compare/1.0.0.4-3...1.0.0.4-4</link>
-      <pubDate>Wed, 04 Jun 2025 00:00:00 GMT</pubDate>
-      <description>Bug fixes and performance improvements.</description>
-    </item>
     <item>
       <title>WSBSD 1.0.0.4-5 Is Delayed</title>
       <link>https://coolis1362.github.io/wsbsd.org/annoucements/1.0.0.4-5.html</link>
       <pubDate>Wed, 14 May 2025 9:20:51 EDT</pubDate>
       <description>We regret to inform you that the release of WSBSD 1.0.0.4-5 has been delayed. We have a busy summer ahead of us, the estimated release date is now August 31st 2025. Sorry the delay will be long. We Are now pausing the WSBSD Project and 1.0.0.4-5 brainstorming.</description>
+    </item>
+    <item>
+      <title>WSBSD RSS News Channel 1 Launched</title>
+      <link>https://coolis1362.github.io/wsbsd.org/wsbsdrssnewschannels/channel1/feed.xml</link>
+      <pubDate>Wed, 14 May 2025 9:43 EDT</pubDate>
+      <description>We are pleased to announce the launch of WSBSD RSS News Channel 1. This channel will provide updates on the latest releases and developments in the WSBSD project. The Other email that's Older then this email is a test of WSBSD RSS News Channel 1. 😊😀 The Link you see is the xml code of WSBSD RSS News Channel 1.</description>
     </item>
   </channel>
 </rss>
